@@ -1,0 +1,136 @@
+name: Update Organization Profile
+
+on:
+  schedule:
+    # Run every 6 hours
+    - cron: '0 */6 * * *'
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  update-profile:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Get organization data
+      id: org-data
+      run: |
+        # Get organization repositories
+        REPOS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/orgs/KRInnov/repos?per_page=100&sort=updated" | \
+          jq -r '.[] | select(.private == false) | {name: .name, description: .description, language: .language, stars: .stargazers_count, updated: .updated_at, url: .html_url}')
+        
+        # Count repositories
+        REPO_COUNT=$(echo "$REPOS" | jq -s 'length')
+        
+        # Get languages
+        LANGUAGES=$(echo "$REPOS" | jq -s '[.[].language] | group_by(.) | map({language: .[0], count: length}) | sort_by(.count) | reverse | .[0:5]')
+        
+        # Get total stars
+        TOTAL_STARS=$(echo "$REPOS" | jq -s 'map(.stars) | add')
+        
+        # Get recent activity (last 30 days)
+        RECENT_ACTIVITY=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/orgs/KRInnov/events?per_page=50" | \
+          jq -r '[.[] | select(.created_at >= (now - 30*24*3600 | strftime("%Y-%m-%dT%H:%M:%SZ")))] | length')
+        
+        echo "repo_count=$REPO_COUNT" >> $GITHUB_OUTPUT
+        echo "total_stars=$TOTAL_STARS" >> $GITHUB_OUTPUT
+        echo "recent_activity=$RECENT_ACTIVITY" >> $GITHUB_OUTPUT
+        
+        # Save detailed data to files
+        echo "$REPOS" | jq -s '.' > repos.json
+        echo "$LANGUAGES" > languages.json
+
+    - name: Update profile README
+      run: |
+        # Get current date
+        CURRENT_DATE=$(date '+%B %d, %Y at %H:%M UTC')
+        
+        # Read current README
+        README_FILE="profile/README.md"
+        
+        # Create updated repository stats section
+        cat > repo_stats_section.md << EOF
+        <div id="repo-stats">
+
+        ### 📈 Organization Statistics
+        - **Total Public Repositories**: ${{ steps.org-data.outputs.repo_count }}
+        - **Total Stars**: ${{ steps.org-data.outputs.total_stars }}
+        - **Recent Activity (30 days)**: ${{ steps.org-data.outputs.recent_activity }} events
+        - **Last Updated**: $CURRENT_DATE
+
+        ### Most Active Repositories
+        EOF
+        
+        # Add top repositories
+        if [ -f repos.json ]; then
+          jq -r '.[:5] | .[] | "- **[\(.name)](\(.url))** - \(.description // "No description") ⭐ \(.stars)"' repos.json >> repo_stats_section.md
+        fi
+        
+        echo "" >> repo_stats_section.md
+        echo "### Technology Stack" >> repo_stats_section.md
+        
+        # Add language statistics
+        if [ -f languages.json ]; then
+          jq -r '.[] | select(.language != null) | "- **\(.language)**: \(.count) repositories"' languages.json >> repo_stats_section.md
+        fi
+        
+        echo "" >> repo_stats_section.md
+        echo "</div>" >> repo_stats_section.md
+        
+        # Replace the repo stats section in README
+        awk '
+        BEGIN { in_section = 0; print_section = 0 }
+        /^<div id="repo-stats">/ { 
+          in_section = 1
+          while ((getline line < "repo_stats_section.md") > 0) {
+            print line
+          }
+          close("repo_stats_section.md")
+          next
+        }
+        /^<\/div>/ && in_section { 
+          in_section = 0
+          next
+        }
+        !in_section { print }
+        ' "$README_FILE" > temp_readme.md
+        
+        mv temp_readme.md "$README_FILE"
+        
+        # Update the loading placeholders in the summary section
+        sed -i "s/- \*\*Total Public Repositories\*\*: Loading.../- **Total Public Repositories**: ${{ steps.org-data.outputs.repo_count }}/" "$README_FILE"
+        sed -i "s/- \*\*Recent Commits\*\*: Loading.../- **Recent Activity (30 days)**: ${{ steps.org-data.outputs.recent_activity }} events/" "$README_FILE"
+        sed -i "s/\*Last updated: Loading...\*/\*Last updated: $CURRENT_DATE\*/" "$README_FILE"
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        if git diff --quiet; then
+          echo "No changes to commit"
+        else
+          git add profile/README.md
+          git commit -m "📊 Auto-update organization profile stats"
+          git push
+        fi
+
+    - name: Cleanup
+      run: |
+        rm -f repos.json languages.json repo_stats_section.md

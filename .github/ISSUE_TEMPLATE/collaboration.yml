@@ -1,0 +1,70 @@
+name: 🤝 Collaboration Request
+description: Propose a collaboration or partnership with KRInnov
+title: "[COLLABORATION] "
+labels: ["collaboration", "partnership"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We're excited about potential collaborations! Please provide details about your proposal.
+  
+  - type: input
+    id: organization
+    attributes:
+      label: Your Organization/Name
+      description: Who are you representing?
+      placeholder: "Organization name or individual name"
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: type
+    attributes:
+      label: Collaboration Type
+      description: What type of collaboration are you proposing?
+      options:
+        - Research Partnership
+        - Open Source Contribution
+        - Educational Initiative
+        - Technical Consulting
+        - Joint Project Development
+        - Community Event
+        - Other
+    validations:
+      required: true
+  
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Collaboration Proposal
+      description: Describe your collaboration idea in detail
+      placeholder: "What do you want to work on together? What are the goals and expected outcomes?"
+    validations:
+      required: true
+  
+  - type: textarea
+    id: resources
+    attributes:
+      label: Resources & Commitment
+      description: What resources can you contribute?
+      placeholder: "Time, expertise, funding, infrastructure, team members..."
+    validations:
+      required: true
+  
+  - type: input
+    id: timeline
+    attributes:
+      label: Proposed Timeline
+      description: What's your expected timeline for this collaboration?
+      placeholder: "2 months, 6 months, ongoing..."
+    validations:
+      required: false
+  
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Information
+      description: How can we reach you?
+      placeholder: "Email, LinkedIn, GitHub profile..."
+    validations:
+      required: true

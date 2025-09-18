@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🌟 Organization Profile
+    url: https://github.com/KRInnov
+    about: Visit our main organization page to see all repositories
+  - name: 💬 Community Discussions
+    url: https://github.com/orgs/KRInnov/discussions
+    about: Join community discussions about projects and ideas
+  - name: 📚 Documentation & Resources
+    url: https://github.com/KRInnov/.github/wiki
+    about: Access documentation, guides, and educational resources

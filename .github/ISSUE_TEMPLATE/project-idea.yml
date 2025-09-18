@@ -1,0 +1,85 @@
+name: 💡 Project Idea
+description: Suggest a new project or research direction for KRInnov
+title: "[IDEA] "
+labels: ["idea", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We love new ideas! Share your thoughts on potential projects or research directions.
+  
+  - type: input
+    id: title
+    attributes:
+      label: Project/Idea Title
+      description: A clear, descriptive title for your idea
+      placeholder: "AI-powered automation tool, Data visualization platform..."
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: Which area does this idea fall under?
+      options:
+        - Artificial Intelligence & Machine Learning
+        - Data Science & Analytics
+        - Software Engineering & Development
+        - Research & Innovation
+        - Education & Community
+        - Tools & Automation
+        - Other
+    validations:
+      required: true
+  
+  - type: textarea
+    id: description
+    attributes:
+      label: Detailed Description
+      description: Explain your idea in detail
+      placeholder: "What problem does this solve? How would it work? What would be the impact?"
+    validations:
+      required: true
+  
+  - type: textarea
+    id: technical
+    attributes:
+      label: Technical Approach
+      description: What technologies or methodologies would be involved?
+      placeholder: "Programming languages, frameworks, algorithms, methodologies..."
+    validations:
+      required: false
+  
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Estimated Complexity
+      description: How complex do you think this project would be?
+      options:
+        - Simple (1-2 weeks)
+        - Medium (1-3 months)
+        - Complex (3-6 months)
+        - Very Complex (6+ months)
+    validations:
+      required: false
+  
+  - type: checkboxes
+    id: involvement
+    attributes:
+      label: Your Involvement
+      description: How would you like to be involved?
+      options:
+        - label: I'd like to contribute to development
+        - label: I can provide domain expertise
+        - label: I'm just sharing the idea
+        - label: I'd like to collaborate as a partner
+  
+  - type: textarea
+    id: resources
+    attributes:
+      label: Relevant Resources
+      description: Any links, papers, or resources related to this idea
+      placeholder: "Research papers, existing tools, related projects..."
+    validations:
+      required: false
