@@ -1,0 +1,67 @@
+name: 📢 Public Announcement
+description: Request a public announcement on the organization noticeboard
+title: "[ANNOUNCEMENT] "
+labels: ["announcement", "public"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for submitting a public announcement request! This will be reviewed by the KRInnov team.
+  
+  - type: input
+    id: title
+    attributes:
+      label: Announcement Title
+      description: A clear, concise title for the announcement
+      placeholder: "New project launch, Community event, Important update..."
+    validations:
+      required: true
+  
+  - type: textarea
+    id: content
+    attributes:
+      label: Announcement Content
+      description: The full content of the announcement
+      placeholder: "Provide detailed information about the announcement..."
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How urgent is this announcement?
+      options:
+        - Low - General information
+        - Medium - Important update
+        - High - Urgent announcement
+    validations:
+      required: true
+  
+  - type: input
+    id: duration
+    attributes:
+      label: Display Duration
+      description: How long should this announcement be displayed?
+      placeholder: "1 week, 1 month, until further notice..."
+    validations:
+      required: false
+  
+  - type: checkboxes
+    id: channels
+    attributes:
+      label: Distribution Channels
+      description: Where should this announcement appear?
+      options:
+        - label: Organization profile README
+        - label: Repository announcements (if applicable)
+        - label: GitHub Discussions
+  
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Information
+      description: Any additional context or special instructions
+      placeholder: "Links, contact information, related resources..."
+    validations:
+      required: false
